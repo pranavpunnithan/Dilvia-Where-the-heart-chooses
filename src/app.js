@@ -1,21 +1,23 @@
-  const express=require("express")
+const express=require("express");
+const app= express();
+const {adminauth}=require("./middlwares/auth");
 
-const app=express();
+app.use("/admin",adminauth);
 
-
-app.use("/user",(req,res,next)=>{
-    console.log("middleware one running");
-    next()
+app.get("/user",(req,res)=>{
+    res.send("userdatasend")
 });
-
-app.get("/user",(req,res,next)=>{
-    console.log("middleware 2 running");
-    next();
+app.get("/admin",(req,res,next)=>{
+    //res.send("alldatasend")
+    next()
 },
+(req,res)=>{
+    res.send(" all  date send")
+}
+)
 
-(req,res,next)=>{
-res.send("Router working")
-})
+
+
 app.listen(3000,()=>{
     console.log("server running")
-})
+}) 
