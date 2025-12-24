@@ -2,8 +2,12 @@ const express=require("express");
 const app= express();
 
 app.get("/getdata",(req,res)=>{
-    throw new Error("jhsbvigbdshv")
-res.send("user data send")
+    try{
+   throw new Error("jhsbvigbdshv")
+   res.status(500).send("something went wrong here")
+    }catch(err){
+        res.status(500).send("contact supoort team")
+    }
 })
 
 
