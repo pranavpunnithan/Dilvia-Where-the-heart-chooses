@@ -1,28 +1,21 @@
 const express=require("express");
+require("./config/database");
+
+const connectDb=require("./config/database")
+
 const app= express();
 
-app.use("/",(err,req,res,next)=>{
-    if(err){
-        res.status(500).send("something went wrong")
-    }
-});
 
-app.get("/getdata",(req,res)=>{
-   // try{
-   throw new Error("jhsbvigbdshv")
-  // res.status(500).send("something went wrong here")
-   // }catch(err){
-   //     res.status(500).send("contact supoort team")
-   // }
-// })
-})
-
-app.use("/",(err,req,res,next)=>{
-    if(err){
-        res.status(500).send("something went wrong")
-    }
-});
-
-app.listen(3000,()=>{
+connectDb()
+.then(()=>{
+    console.log("Datebase connected sucessfully");
+    app.listen(3000,()=>{
     console.log("server running")
 }) 
+})
+
+.catch((err)=>{
+    console.log("database cannot be connected")
+})
+
+
