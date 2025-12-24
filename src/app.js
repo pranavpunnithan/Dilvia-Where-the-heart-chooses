@@ -1,23 +1,17 @@
 const express=require("express");
 const app= express();
-const {adminauth}=require("./middlwares/auth");
 
-app.use("/admin",adminauth);
+app.get("/getdata",(req,res)=>{
+    throw new Error("jhsbvigbdshv")
+res.send("user data send")
+})
 
-app.get("/user",(req,res)=>{
-    res.send("userdatasend")
+
+app.use("/",(err,req,res,next)=>{
+    if(err){
+        res.status(500).send("something went wrong")
+    }
 });
-app.get("/admin",(req,res,next)=>{
-    //res.send("alldatasend")
-    next()
-},
-(req,res)=>{
-    res.send(" all  date send")
-}
-)
-
-
-
 app.listen(3000,()=>{
     console.log("server running")
 }) 
