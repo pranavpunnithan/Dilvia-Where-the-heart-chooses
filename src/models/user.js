@@ -23,5 +23,6 @@ const userSchema=new mongoose.Schema({
 })
 
 const User= mongoose.model("User",userSchema);
+//created a model by using the scheme and it is exporting to app.js to connect to app.js because that is where server is running
 
 module.exports=User;

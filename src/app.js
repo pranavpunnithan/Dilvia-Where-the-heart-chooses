@@ -5,8 +5,10 @@ const connectDb=require("./config/database")
 
 const app= express();
 const User=require("./models/user");
+app.use(express.json());
 
 app.post("/signup",async(req,res)=>{
+    console.log(req.body);
     const userObj={
         firstName:"MS",
         lastName:"Dhoni",
@@ -22,21 +24,21 @@ await user.save();
 //.save returns a promise hence we have to use async ,await
 res.send("User Added Sucessfully")
 }
-catch{
+catch(err){
     res.status(400).send("Error saving the user:" + err.message);
-}
-});
+} 
+}); 
 
 connectDb()
 .then(()=>{
     console.log("Datebase connected sucessfully");
     app.listen(3000,()=>{
     console.log("server running")
-}) 
+});
 })
 
 .catch((err)=>{
     console.log("database cannot be connected")
-})
+});
 
 
