@@ -8,16 +8,10 @@ const User=require("./models/user");
 app.use(express.json());
 
 app.post("/signup",async(req,res)=>{
-    console.log(req.body);
-    const userObj={
-        firstName:"MS",
-        lastName:"Dhoni",
-        emailId:"MSD@gmail.com",
-        password:"Msd@123"
-    }
+   
 
-const user=new User(userObj);
-//CREATING A NEW INSTATNCE OF THE USER MODEL
+const user=new User(req.body);
+//CREATING A NEW INSTATNCE OF THE USER MODEL and through req.body it is taking the input from api and adding it to database
 
 try{
 await user.save();
