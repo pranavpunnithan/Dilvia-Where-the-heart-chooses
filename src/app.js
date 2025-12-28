@@ -93,23 +93,14 @@ app.patch("/user", async(req,res)=>{
     const userId=req.body.userId;
     const data=req.body;
     try{
-        await User.findByIdAndUpdate({_id:userId},data);
+        await User.findByIdAndUpdate({_id:userId},data,
+        {runValidators:true});
         res.send("User updated sucessfully")
     }catch(err){
         res.status(400).send("Something went wrong");
     }
 });
-//Update data of the user using gmail.
-app.patch("/userx", async(req,res)=>{
-    const emailId=req.body.emailId;
-    const data=req.body;
-    try{
-        await User.findOneAndUpdate({emailId:emailId},data);
-        res.send("User updated sucessfully")
-    }catch(err){
-        res.status(400).send("Something went wrong");
-    }
-});
+
 
 connectDb()
 .then(()=>{
