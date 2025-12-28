@@ -99,7 +99,7 @@ app.patch("/user", async(req,res)=>{
         res.status(400).send("Something went wrong");
     }
 });
-//Update data of the user using gmail
+//Update data of the user using gmail.
 app.patch("/userx", async(req,res)=>{
     const emailId=req.body.emailId;
     const data=req.body;
@@ -121,6 +121,6 @@ connectDb()
 
 .catch((err)=>{
     console.log("database cannot be connected")
-});
+}); 
 
 
