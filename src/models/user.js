@@ -1,5 +1,5 @@
 const mongoose=require('mongoose');
-
+const validator=require("validator")
 const userSchema=new mongoose.Schema({
   firstName:{
     type:String,
@@ -17,11 +17,22 @@ const userSchema=new mongoose.Schema({
     required:true,
     unique:true,
     trim:true,
+    validate(value){
+      if(!validator.isEmail(value)){
+        throw new Error("Invalid email address")
+      }
+    }
   },
   password:{
     type:String,
     required:true,
-    select:false
+    select:false,
+    validate(value){
+     if(!validator.isStrongPassword(value)){
+      throw new Error("Enter a Strog Password");
+     }
+    }
+   
   },
   age:{
     type:Number,
@@ -42,7 +53,17 @@ const userSchema=new mongoose.Schema({
     default:"This is a default about of the user"
   },
   skills:{
-    type:[String],
+    type:[
+      {
+        type:String,
+        trim:true,
+        maxlength:10
+      }
+    ],
+    validate:{
+  validator:v=>v.length<=15,
+  message:"Max 15 skills allowed "
+    }
   }
 },{
   timestamps:true,

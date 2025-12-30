@@ -89,10 +89,23 @@ app.delete("/user", async(req,res)=>{
     }
 });
 //Update data of the user
-app.patch("/user", async(req,res)=>{
-    const userId=req.body.userId;
+app.patch("/user/:userId", async(req,res)=>{
+    const userId=req.params?.userId;
     const data=req.body;
-    try{
+
+        
+        try{
+            
+    const ALLOWED_UPDATES=[
+        "about","gender","age"
+    ]
+
+    const isUpdateAllowed=Object.keys(data).every((k)=>
+        ALLOWED_UPDATES.includes(k)
+        );
+        if(!isUpdateAllowed){
+            throw new Error("Update not allowed");
+        }
         await User.findByIdAndUpdate({_id:userId},data,
         {runValidators:true});
         res.send("User updated sucessfully")
@@ -100,6 +113,38 @@ app.patch("/user", async(req,res)=>{
         res.status(400).send("Something went wrong");
     }
 });
+// PATCH API to update user details partially
+
+// Route: /user/:userId
+// Method: PATCH
+
+// userId is taken from route params
+// It is used only to identify which user to update
+// userId is NOT updated in the database
+
+// req.body contains only the fields the client wants to update
+// Example request body: { age: 26, about: "Backend dev" }
+
+// Wrap database logic in try-catch to handle errors safely
+
+// ALLOWED_UPDATES defines which fields are allowed to be modified
+// This prevents updating sensitive fields like password, email, _id
+
+// Object.keys(data) extracts only the fields sent by the client
+// every() checks that ALL fields are present in ALLOWED_UPDATES
+// key represents one field name at a time from req.body
+
+// If any field is not allowed, throw an error
+// This immediately blocks unauthorized updates
+
+// findByIdAndUpdate uses userId to locate the user document
+// data is used as the update object
+// runValidators ensures schema validation rules are applied
+
+// If update succeeds, send a success response to the client
+
+// catch block handles validation errors or database failures
+// Sends a 400 status to avoid crashing the server
 
 
 connectDb()
