@@ -6,14 +6,30 @@ const connectDb=require("./config/database")
 const app= express();
 const User=require("./models/user");
 app.use(express.json());
-
+const {validateSignUpData}=require("./utils/validation");
+const bcrypt=require("bcrypt");
+const validator=require("validator");
 app.post("/signup",async(req,res)=>{
-   
-
-const user=new User(req.body);
-//CREATING A NEW INSTATNCE OF THE USER MODEL and through req.body it is taking the input from api and adding it to database
 
 try{
+//validation of the data
+validateSignUpData(req);
+
+//encrypt the password(BCRYPT IS USED)
+const {firstName,lastName,emailId,password}=req.body;
+const passwordHash=await bcrypt.hash(password,10);
+console.log(passwordHash);
+
+   
+
+const user=new User({
+    firstName,
+    lastName,
+    emailId,
+    password:passwordHash,
+});
+//CREATING A NEW INSTATNCE OF THE USER MODEL and through req.body it is taking the input from api and adding it to database
+
 await user.save();
 //.save returns a promise hence we have to use async ,await
 res.send("User Added Sucessfully")
@@ -22,6 +38,36 @@ catch(err){
     res.status(400).send("Error saving the user:" + err.message);
 } 
 }); 
+
+
+//login
+app.post("/login",async(req,res)=>{
+    try{
+   
+     const {emailId,password} =req.body;
+
+      if (!emailId || !password) {
+      throw new Error("Email and password are required");
+    }
+
+      if(!validator.isEmail(emailId)){
+        throw new Error("Email is not valid");
+    }
+      const user=await User.findOne({emailId:emailId}).select("+password");
+      if(!user){
+        throw new Error("Invalid credentails");
+      } 
+      const isPasswordValid= await bcrypt.compare(password,user.password);
+      if(isPasswordValid){
+        res.send("Login Successful");
+      }else{
+        throw new Error("Password not correct");
+      }
+
+    }catch(err){
+    res.status(400).send("Error saving the user:" + err.message);    
+    }
+})
 
 //get user by email
 
@@ -145,6 +191,7 @@ app.patch("/user/:userId", async(req,res)=>{
 
 // catch block handles validation errors or database failures
 // Sends a 400 status to avoid crashing the server
+//npm installed validator
 
 
 connectDb()
