@@ -9,6 +9,10 @@ app.use(express.json());
 const {validateSignUpData}=require("./utils/validation");
 const bcrypt=require("bcrypt");
 const validator=require("validator");
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+
 app.post("/signup",async(req,res)=>{
 
 try{
@@ -59,15 +63,61 @@ app.post("/login",async(req,res)=>{
       } 
       const isPasswordValid= await bcrypt.compare(password,user.password);
       if(isPasswordValid){
-        res.send("Login Successful");
+        //create a JWT token  npm i jsonwebtoken before that cookie-parser
+     const token =await jwt.sign({_id:user._id},"Tinter@web$110");
+     console.log(token);
+
+     //Add the token to cookie and send the response back to the user
+     res.cookie("token",token);
+     res.send("Login Sucessful")
       }else{
-        throw new Error("Password not correct");
+        throw new Error("Invalid credential");
       }
 
     }catch(err){
     res.status(400).send("Error saving the user:" + err.message);    
     }
 })
+/* %!!
+Login API to authenticate an existing user
+
+Read emailId and password sent from the client in the request body
+
+Check whether emailId or password is missing
+
+Stop execution if required fields are not provided
+
+Validate the email format to ensure it is correct
+
+Query the database to find a user with the given emailId
+
+Explicitly include the password field since it is excluded by default
+
+Stop login process if the user does not exist
+
+Compare the entered plain-text password with the hashed password from the database
+
+Allow login only if the password comparison is successful
+
+Create a JWT token using the user's unique MongoDB _id as payload
+
+Sign the token using a secret key to prevent tampering or forgery
+
+Log the generated token for debugging purposes (development only)
+
+Store the JWT token in a browser cookie for authentication
+
+Send a success response after successful login
+
+Reject the login attempt if the password is incorrect
+
+Catch any error that occurs during validation or authentication
+
+Send an error response with status code 400 and the error message
+!!%*/
+
+
+
 
 //get user by email
 
@@ -112,6 +162,64 @@ NOTE:
 - MongoDB stores the actual data; the model is used only to query it.
 - Only one response is sent per request using return when needed.
 */
+
+app.get("/profile",async(req,res)=>{
+    try{
+        const cookies=req.cookies;
+        const {token}=cookies;
+        if(!token){
+            throw new Error("Invalid Token");
+        }
+        const decodeMessage=await jwt.verify(token,"Tinter@web$110");
+        const{_id}=decodeMessage;
+        console.log("Logged In user isL:" + _id);
+        const user= await User.findById(_id);
+        if(!user){
+            throw new Error("User doesnt exist");
+        }
+        res.send(user);
+    }catch(err){
+        res.status(400).send("Error:" + err.message);
+    }
+})
+/*
+This route handles fetching the logged-in user's profile information.
+
+1) When a client (browser/Postman) hits GET /profile, it automatically sends cookies along with the request.
+   These cookies were previously set during login using res.cookie("token", token).
+
+2) req.cookies contains all cookies sent by the client.
+   From that object, we extract the JWT token stored under the key "token".
+
+3) If the token is not present, it means:
+   - User is not logged in
+   - OR cookie was cleared/expired
+   So we throw an error saying the token is invalid.
+
+4) jwt.verify() checks whether the token is real and untampered.
+   - It uses the SAME secret key that was used during jwt.sign() in login.
+   - If the token is fake, expired, or modified, verification fails.
+
+5) If verification succeeds, jwt.verify() returns the payload.
+   In our case, the payload contains the user’s MongoDB _id.
+
+6) We extract _id from the decoded token.
+   This _id uniquely identifies the logged-in user in the database.
+
+7) Using this _id, we query MongoDB to fetch the user document.
+   This ensures the user still exists in the database.
+
+8) If no user is found, it means:
+   - The user account was deleted
+   - Or the token is referencing an invalid user
+   So we throw an error.
+
+9) If everything is valid, we send the user data as the response.
+
+10) Any error at any step is caught in the catch block,
+    and an error response is sent back to the client.
+*/
+
 
 app.get("/feed",async(req,res)=>{
     try{
