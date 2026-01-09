@@ -129,7 +129,7 @@ app.post("/sendConnectionRequest",userAuth,async(req,res)=>{
     //sending a connection request
     res.send(user.firstName +"send the connection request");
 })
-
+//
 
 
 connectDb()
