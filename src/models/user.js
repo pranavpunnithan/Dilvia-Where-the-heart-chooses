@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require("validator");
-
+const bcrypt=require("bcrypt");
+const jwt = require("jsonwebtoken");
 const userSchema = new mongoose.Schema({
 
   firstName: {
@@ -90,13 +91,44 @@ const userSchema = new mongoose.Schema({
 }
 );
 
+
+
+// Adding a custom instance method to the user schema
+// This method will be available on every user document
+
+// 'this' refers to the current user object that called this method
+// Example: the logged-in user's MongoDB record
+//THIS can be used when instance of a model is created
+//This can be used only when writing proper function and not arrow function
+
+// Storing the current user document in a variable for easy access
+
+// Creating a JWT token using the user's _id as payload
+// This helps identify which user is making future requests
+
+// Secret key is used to sign the token so it cannot be tampered with
+// In real projects, this should be stored in .env, not hardcoded
+
+// Setting token expiry to 7 days for security
+
+// Returning the generated token to the controller or app.js
+// So it can be sent to browser and stored in cookies
+
 userSchema.methods.getJWT= async function (){
   const user=this;
-  
-
+  const token= await jwt.sign({_id:user._id},"Tinter@web$110",{expiresIn:"7d"});
+ return token;
 }
 
 
+userSchema.methods.validatePassword= async function(passwordInputByUser){
+  const user=this;
+  const passwordHash= this.password;
+
+  const isPasswordValid= await bcrypt.compare(passwordInputByUser,passwordHash);
+
+  return isPasswordValid;
+}
 
 
 const User = mongoose.model("User", userSchema);
