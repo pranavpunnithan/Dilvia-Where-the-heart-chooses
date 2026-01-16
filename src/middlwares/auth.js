@@ -76,7 +76,7 @@ const userAuth=async(req,res,next)=>{
 
      const {_id}= decodedobj;
 
-     const user= await User.findById(_id);
+     const user= await User.findById(_id).select("+password");
      if(!user){
         throw new Error("User Not Found");
      }
