@@ -21,6 +21,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     trim: true,       // Sanitizer: removes extra spaces
+    unique:true, //In MongoDB, unique: true creates a unique index, which both improves query performance and enforces data integrity by preventing duplicate values.
 
     // Custom validator: checks if email format is valid
     validate(value) {
@@ -92,7 +93,8 @@ const userSchema = new mongoose.Schema({
 );
 
 
-
+//👉 When creating a schema method, ALWAYS use a normal function.
+//❌ Never use arrow function.
 // Adding a custom instance method to the user schema
 // This method will be available on every user document
 
