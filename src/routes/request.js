@@ -61,8 +61,8 @@ requestrouter.post("/request/review/:status/:requestId",
             return res.status(400).json({mesage:"Status not allowed"});
          }
          const connectionRequest=await ConnectionRequest.findOne({
-            _id:requestId,
-            toUserId:loggedInUser._id,
+            _id:requestId, //this is the connection rqst id
+            toUserId:loggedInUser._id,  // this is the logged in user id
             status:"interested"
          });
          if(!connectionRequest){

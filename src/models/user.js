@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     lowercase: true,  // Sanitizer: converts email to lowercase before saving
     required: true,
-    unique: true,
+    unique: true, //to put an index on email(indexing)
     trim: true,       // Sanitizer: removes extra spaces
     unique:true, //In MongoDB, unique: true creates a unique index, which both improves query performance and enforces data integrity by preventing duplicate values.
 
